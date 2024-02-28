@@ -17,18 +17,31 @@ def recommend(duration, price):
     all_packages = package_data.copy()
     all_packages['PredictedRating'] = model.predict(all_packages[['Duration', 'Price']])
     
-    # Sort packages by predicted rating
+    # Sort the packages by their predicted rating in descending order
     sorted_packages = all_packages.sort_values(by='PredictedRating', ascending=False)
 
-    # Select the top 5 packages
-    top_5_packages = sorted_packages.head(5)
+    # Define tolerances for duration and price
+    duration_tolerance = 2  
+    price_tolerance = 5000 
 
-    # Include necessary fields in the result
-    return top_5_packages[['Destination', 'PredictedRating', 'Duration', 'Price']]
+    # Find packages within the specified tolerances
+    close_matches = sorted_packages.loc[(abs(sorted_packages['Duration'] - duration) <= duration_tolerance) & 
+                                        (abs(sorted_packages['Price'] - price) <= price_tolerance)]
+
+    # Select the top 5 packages
+    top_5_packages = close_matches.head(5)
+
+    if not top_5_packages.empty:
+        return top_5_packages[['Travel_Company','Destination', 'PredictedRating', 'Duration', 'Price']]
+    else:
+        return "No matching packages found."
 
 if __name__ == "__main__":
     duration = int(sys.argv[1])
     price = int(sys.argv[2])
 
     recommendations = recommend(duration, price)
-    print(recommendations.to_json(orient='records'))
+    if isinstance(recommendations, pd.DataFrame):
+        print(recommendations.to_json(orient='records'))
+    else:
+        print(recommendations)

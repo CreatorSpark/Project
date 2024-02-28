@@ -32,7 +32,7 @@ const SearchBar = ({ onSearch }) => {
 
             const data = await response.json();
             onSearch(data);
-            
+            console.log(data)
         } catch (error) {
             console.error('Error:', error);
         }

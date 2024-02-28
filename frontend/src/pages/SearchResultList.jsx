@@ -15,10 +15,10 @@ const SearchResultList = ({ searchResults }) => {
           <Card>
             <div className="tour__img">
               <img src="tour-images/tour.jpg" alt="tour" />
-            </div>zzzzzzzzzz
+            </div>
             <CardBody>
               <h5 className="tour__title mt-2">
-                <Link to="#">{result.Destination}</Link>
+                <span>{result.Travel_Company}</span>
               </h5>
               <div className="tour__details">
                 <span className="tour__location d-flex align-items-center gap-1">
