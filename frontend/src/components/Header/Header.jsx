@@ -1,9 +1,9 @@
-import React, { useRef, useEffect, useContext, useState } from "react";
-import { Container, Row, Button } from "reactstrap";
-import { NavLink, Link, useNavigate } from "react-router-dom";
-import logo from "../../assets/images/logo.png";
-import { AuthContext } from "../../context/AuthContext";
-import "./header.css";
+import React, { useRef, useEffect, useContext, useState } from "react"
+import { Container, Row, Button } from "reactstrap"
+import { NavLink, Link, useNavigate } from "react-router-dom"
+import logo from "../../assets/images/logo.png"
+import { AuthContext } from "../../context/AuthContext"
+import "./header.css"
 
 const nav__links = [
   {
@@ -18,19 +18,19 @@ const nav__links = [
     path: "/tours",
     display: "Tours",
   },
-];
+]
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to keep track of menu open/close
-  const headerRef = useRef(null);
-  const menuRef = useRef(null);
-  const { user, dispatch } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false) // State to keep track of menu open/close
+  const headerRef = useRef(null)
+  const menuRef = useRef(null)
+  const { user, dispatch } = useContext(AuthContext)
+  const navigate = useNavigate()
 
   const logout = () => {
-    dispatch({ type: "LOGOUT" });
-    navigate("/");
-  };
+    dispatch({ type: "LOGOUT" })
+    navigate("/")
+  }
 
   const stickyHeaderFunc = () => {
     window.addEventListener("scroll", () => {
@@ -39,20 +39,20 @@ const Header = () => {
           document.body.scrollTop > 80 ||
           document.documentElement.scrollTop > 80
         ) {
-          headerRef.current.classList?.add("sticky__header");
+          headerRef.current.classList?.add("sticky__header")
         } else {
-          headerRef.current.classList?.remove("sticky__header");
+          headerRef.current.classList?.remove("sticky__header")
         }
       }
-    });
-  };
+    })
+  }
 
   useEffect(() => {
-    stickyHeaderFunc();
-    return () => window.removeEventListener("scroll", stickyHeaderFunc);
-  });
+    stickyHeaderFunc()
+    return () => window.removeEventListener("scroll", stickyHeaderFunc)
+  })
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen); // Toggle menu open/close state
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen) // Toggle menu open/close state
 
   return (
     <header className="header" ref={headerRef}>
@@ -65,7 +65,11 @@ const Header = () => {
               </Link>
             </div>
             {/*Menu start */}
-            <div className={`navigation ${isMenuOpen ? "show__menu" : ""}`} ref={menuRef} onClick={toggleMenu}>
+            <div
+              className={`navigation ${isMenuOpen ? "show__menu" : ""}`}
+              ref={menuRef}
+              onClick={toggleMenu}
+            >
               <ul className="menu d-flex align-items-center gap-5">
                 {nav__links.map((item, index) => {
                   return (
@@ -79,7 +83,7 @@ const Header = () => {
                         {item.display}
                       </NavLink>
                     </li>
-                  );
+                  )
                 })}
               </ul>
             </div>
@@ -88,9 +92,11 @@ const Header = () => {
               <div className="nav__btns d-flex align-items-center gap-4">
                 {user ? (
                   <>
-                    <h5 className="mb-0 p-2 logged__in_h5">
-                      Hello
-                    </h5>
+                    <Link to="/profile">
+                      <h5 className="mb-0 p-2 logged__in_h5">
+                        {user?.user?.fullName}
+                      </h5>
+                    </Link>
                     <Button className="btn btn-dark" onClick={logout}>
                       Logout
                     </Button>
@@ -109,15 +115,18 @@ const Header = () => {
 
               <span className="mobile__menu" onClick={toggleMenu}>
                 {/* Use the icon class to render the close icon */}
-                {isMenuOpen ? <i className="ri-close-line"></i> : <i className="ri-menu-line"></i>}
+                {isMenuOpen ? (
+                  <i className="ri-close-line"></i>
+                ) : (
+                  <i className="ri-menu-line"></i>
+                )}
               </span>
             </div>
           </div>
         </Row>
       </Container>
     </header>
-    
-  );
-};
+  )
+}
 
-export default Header;
+export default Header
