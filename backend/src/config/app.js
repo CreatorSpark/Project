@@ -7,8 +7,10 @@ const { NODE_ENV } = require("../constants/env")
 const app = express()
 
 const corsOptions = {
-	origin: ["http://localhost:3000", "http://localhost:3001", "http://*"],
-}
+  origin: true,
+  credentials: true,
+};
+
 
 // finding node environment
 require("dotenv").config({ path: "./.env" }) // The path is relative to the root of the project

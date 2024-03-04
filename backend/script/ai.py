@@ -34,14 +34,15 @@ def recommend(duration, price):
     if not top_5_packages.empty:
         return top_5_packages[['Travel_Company','Destination', 'PredictedRating', 'Duration', 'Price']]
     else:
-        return "No matching packages found."
+       return pd.DataFrame()
 
 if __name__ == "__main__":
-    duration = int(sys.argv[1])
-    price = int(sys.argv[2])
+    try:
+        duration = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1] != 'undefined' else 0
+        price = int(sys.argv[2]) if len(sys.argv) > 2 and sys.argv[2] != 'undefined' else 0
 
-    recommendations = recommend(duration, price)
-    if isinstance(recommendations, pd.DataFrame):
+        recommendations = recommend(duration, price)
         print(recommendations.to_json(orient='records'))
-    else:
-        print(recommendations)
+    except (IndexError, ValueError):
+        print("Invalid input parameters")
+        

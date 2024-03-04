@@ -1,122 +1,123 @@
-import React, { useEffect } from "react"
-import { Container, Row, Button } from "reactstrap"
-import { NavLink, Link } from "react-router-dom"
-import logo from "../../assets/images/logo.png"
-import "./header.css"
+import React, { useRef, useEffect, useContext, useState } from "react";
+import { Container, Row, Button } from "reactstrap";
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import logo from "../../assets/images/logo.png";
+import { AuthContext } from "../../context/AuthContext";
+import "./header.css";
 
 const nav__links = [
-	{
-		path: "/home",
-		display: "Home",
-	},
-	{
-		path: "/about",
-		display: "About",
-	},
-	{
-		path: "/tours",
-		display: "Tours",
-	},
-]
+  {
+    path: "/",
+    display: "Home",
+  },
+  {
+    path: "/about",
+    display: "About",
+  },
+  {
+    path: "/tours",
+    display: "Tours",
+  },
+];
 
 const Header = () => {
-	// get user and token from local storage
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to keep track of menu open/close
+  const headerRef = useRef(null);
+  const menuRef = useRef(null);
+  const { user, dispatch } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-	const [user, setUser] = React.useState(null)
-	const [token, setToken] = React.useState(null)
-	const [isLoggedIn, setIsLoggedIn] = React.useState(false)
+  const logout = () => {
+    dispatch({ type: "LOGOUT" });
+    navigate("/");
+  };
 
-	useEffect(() => {
-		login()
-	}, [])
+  const stickyHeaderFunc = () => {
+    window.addEventListener("scroll", () => {
+      if (headerRef.current) {
+        if (
+          document.body.scrollTop > 80 ||
+          document.documentElement.scrollTop > 80
+        ) {
+          headerRef.current.classList?.add("sticky__header");
+        } else {
+          headerRef.current.classList?.remove("sticky__header");
+        }
+      }
+    });
+  };
 
-	const login = () => {
-		const localUser = JSON.parse(localStorage.getItem("user"))
-		const localToken = localStorage.getItem("token")
+  useEffect(() => {
+    stickyHeaderFunc();
+    return () => window.removeEventListener("scroll", stickyHeaderFunc);
+  });
 
-		if (!localToken || !localUser) {
-			logout()
-			return
-		}
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen); // Toggle menu open/close state
 
-		setUser(localUser)
-		setToken(localToken)
-		setIsLoggedIn(true)
-	}
+  return (
+    <header className="header" ref={headerRef}>
+      <Container>
+        <Row>
+          <div className="nav__wrapper d-flex align-items-center justify-content-between">
+            <div className="logo">
+              <Link to="/">
+                <img src={logo} alt="" />
+              </Link>
+            </div>
+            {/*Menu start */}
+            <div className={`navigation ${isMenuOpen ? "show__menu" : ""}`} ref={menuRef} onClick={toggleMenu}>
+              <ul className="menu d-flex align-items-center gap-5">
+                {nav__links.map((item, index) => {
+                  return (
+                    <li className="nav__item" key={index}>
+                      <NavLink
+                        to={item.path}
+                        className={(navClass) =>
+                          navClass.isActive ? "active__link" : ""
+                        }
+                      >
+                        {item.display}
+                      </NavLink>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
 
-	const logout = () => {
-		setIsLoggedIn(false)
-		localStorage.removeItem("user")
-		localStorage.removeItem("token")
-		// window.location.href = "/"
-	}
+            <div className="nav__right d-flex align-items-center gap-4">
+              <div className="nav__btns d-flex align-items-center gap-4">
+                {user ? (
+                  <>
+                    <h5 className="mb-0 p-2 logged__in_h5">
+                      Hello
+                    </h5>
+                    <Button className="btn btn-dark" onClick={logout}>
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button className="btn secondary__btn">
+                      <Link to="/login">Login</Link>
+                    </Button>
+                    <Button className="btn primary__btn">
+                      <Link to="/register">Register</Link>
+                    </Button>
+                  </>
+                )}
+              </div>
 
-	return (
-		<header className="header">
-			<Container>
-				<Row>
-					<div className="nav__wrapper d-flex align-items-center justify-content-between">
-						{/*---------logo--------- */}
-						<div className="logo">
-							<img src={logo} alt="" />
-						</div>
-						{/* --------logo end------*/}
-						{/* ------Start menu------ */}
-						<div className="navigation">
-							<ul className="menu d-flex align-items-center gap-5">
-								{nav__links.map((item, index) => (
-									<li className="nav__item" key={index}>
-										<NavLink
-											to={item?.path}
-											className={(navClass) =>
-												navClass.isActive ? "active__link" : ""
-											}
-										>
-											{item?.display}
-										</NavLink>
-									</li>
-								))}
-							</ul>
-						</div>
-						{/* ------end menu------ */}
-						{!isLoggedIn ? (
-							<div className="nav_right d-flex align-items-center gap-4">
-								<div className="nav__btn d-flex align-items-center gap-4">
-									<Button className="btn secondary__btn">
-										<Link to="/login">Login</Link>
-									</Button>
-									<Button className="btn primary__btn">
-										<Link to="/register">Register</Link>
-									</Button>
-								</div>
-								<span className="mobile__menu">
-									<i className="ri-menu-line"></i>
-								</span>
-							</div>
-						) : (
-							<div className="nav_right d-flex align-items-center gap-4">
-								<div className="nav__btn d-flex align-items-center gap-4">
-									<Button className="btn secondary__btn">
-										{user?.fullName}
-									</Button>
-									<Button
-										className="btn primary__btn"
-										style={{ backgroundColor: "#ff0000" }}
-										onClick={logout}
-									>
-										Logout
-									</Button>
-								</div>
-								<span className="mobile__menu">
-									<i className="ri-menu-line"></i>
-								</span>
-							</div>
-						)}
-					</div>
-				</Row>
-			</Container>
-		</header>
-	)
-}
+              <span className="mobile__menu" onClick={toggleMenu}>
+                {/* Use the icon class to render the close icon */}
+                {isMenuOpen ? <i className="ri-close-line"></i> : <i className="ri-menu-line"></i>}
+              </span>
+            </div>
+          </div>
+        </Row>
+      </Container>
+    </header>
+    
+  );
+};
 
-export default Header
+export default Header;

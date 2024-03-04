@@ -1,116 +1,131 @@
-import React, { useState } from "react"
-import toast from "react-hot-toast"
-import { useNavigate } from "react-router"
-import {
-	Container,
-	Row,
-	Col,
-	Form,
-	FormGroup,
-	Label,
-	Input,
-	Button,
-	NavLink,
-} from "reactstrap"
+import React, { useState, useContext } from "react";
+import { Container, Row, Col, Form, FormGroup, Button } from "reactstrap";
+import { Link, useNavigate } from "react-router-dom";
+import "../styles/Login.css";
+import loginImg from "../assets/images/login.png";
+import userIcon from "../assets/images/user.png";
+import { AuthContext } from "../context/AuthContext";
 
 const Login = () => {
-	const [showPassword, setShowPassword] = useState(false)
-	const [error, setError] = useState("")
-	const [loading, setLoading] = useState(false)
-	const navigate = useNavigate()
+  const [credentials, setCredentials] = useState({
+    email: "",
+    password: "",
+  });
 
-	const handleSubmit = async (e) => {
-		e.preventDefault()
-		const { email, password } = e.target.elements
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [showPassword, setShowPassword] = useState(false); 
 
-		const user = {
-			email: email.value,
-			password: password.value,
-		}
+  const { dispatch } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-		if (Object.values(user).some((el) => el === "")) {
-			setError("Please fill all fields")
-			return
-		}
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setCredentials((prevCredentials) => ({
+      ...prevCredentials,
+      [id]: value,
+    }));
+  };
 
-		try {
-			setLoading(true)
+  const handleClick = async (e) => {
+    e.preventDefault();
 
-			const res = await fetch("http://localhost:5000/api/v1/auth/login", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(user),
-			})
-			const data = await res.json()
+    dispatch({ type: "LOGIN_START" });
+    setError(null); // Reset the error on each login attempt
+    try {
+      const res = await fetch("http://localhost:5000/api/v1/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(credentials),
+      });
 
-			if (data.success) {
-				navigate("/")
-				toast.success(data?.message)
-			} else {
-				toast.error(data?.message)
-				setError(data?.message)
-			}
-			setLoading(false)
-		} catch (err) {
-			console.log(err)
-			setError(err.message)
-			toast.error(err.message)
-			setLoading(false)
-		}
-	}
+      const result = await res.json();
 
-	return (
-		<Container>
-			<Row className="mt-5">
-				<Col md={{ size: 6, offset: 3 }}>
-					<Form onSubmit={handleSubmit}>
-						<FormGroup>
-							<Label for="email">Email</Label>
-							<Input
-								type="email"
-								name="email"
-								id="email"
-								placeholder="Enter your email"
-								required
-							/>
-						</FormGroup>
-						<FormGroup>
-							<Label for="password">Password</Label>
-							<Input
-								type={showPassword ? "text" : "password"}
-								name="password"
-								id="password"
-								placeholder="Enter your password"
-								required
-							/>
-							<Button
-								type="button"
-								color="link"
-								className="password-toggle"
-								onClick={() => setShowPassword(!showPassword)}
-							>
-								{showPassword ? "Hide Password" : "Show Password"}
-							</Button>
-						</FormGroup>
-						{error && <div className="text-danger">{error}</div>}
-						<Button color="primary" block>
-							Login
-						</Button>
-					</Form>
-					<div className="mt-3">
-						<NavLink href="/forgot-password">Forgot Password?</NavLink>
-					</div>
-					<div className="mt-2 text-blue-600">
-						<NavLink href="/register">
-							Don't have an account? Sign up here
-						</NavLink>
-					</div>
-				</Col>
-			</Row>
-		</Container>
-	)
-}
+      if (!res.ok) {
+        setError(result.message);
+        dispatch({ type: "LOGIN_FAILURE", payload: result.message });
+      } else {
+        dispatch({ type: "LOGIN_SUCCESS", payload: result });
+        setSuccess("Login successful!"); // Set the success message
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      }
+    } catch (error) {
+      setError("An error occurred while logging in. Please try again later.");
+      dispatch({ type: "LOGIN_FAILURE", payload: error.message });
+    }
+  };
 
-export default Login
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  return (
+    <section>
+      <Container>
+        <Row>
+          <Col lg="8" className="m-auto">
+            <div className="login__container d-flex justify-content-between">
+              <div className="login__img">
+                <img src={loginImg} alt="" />
+              </div>
+
+              <div className="login__form">
+                <div className="user">
+                  <img src={userIcon} alt="" />
+                </div>
+                <h2>Login</h2>
+                {error && <div className="alert alert-danger">{error}</div>}
+                {success && <div className="alert alert-success">{success}</div>}
+                <Form onSubmit={handleClick}>
+                  <FormGroup>
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      required
+                      autoComplete="true"
+                      id="email"
+                      onChange={handleChange}
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <div className="password__input">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        required
+                        autoComplete="true"
+                        id="password"
+                        onChange={handleChange}
+                      />
+                      <i
+                        className={`ri-eye-line${showPassword ? "-slash" : ""}`}
+                        onClick={togglePasswordVisibility}
+                      ></i>
+                    </div>
+                  </FormGroup>
+                  <Button
+                    className="btn secondary__btn auth__btn"
+                    type="submit"
+                    onClick={handleClick}
+                  >
+                    Login
+                  </Button>
+                </Form>
+                <p>
+                  Don't have an account? <Link to="/register">Register</Link>
+                </p>
+              </div>
+            </div>
+          </Col>
+        </Row>
+      </Container>
+    </section>
+  );
+};
+
+export default Login;

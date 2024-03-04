@@ -8,6 +8,7 @@ import TourDetails from './../pages/TourDetails';
 import Login from './../pages/Login';
 import Register from './../pages/Register';
 import SearchResultList from './../pages/SearchResultList';
+import Book from '../pages/Book';
 
 
 
@@ -20,6 +21,7 @@ const Routers = () => {
         <Route path='/' element={<Navigate to='/home'/>} />
         <Route path="/home" element={<Home/>}/>
         <Route path="/tours" element={<Tours/>}/>
+         <Route path="/book" element={<Book/>}/>
         <Route path="/tours/:id" element={<TourDetails/>}/>
         <Route path="/login" element={<Login/>}/>
         <Route path="/register" element={<Register/>}/>

@@ -1,6 +1,9 @@
 import React, { useRef } from "react";
+
 import "./search-bar.css";
 import { Form, FormGroup } from "reactstrap";
+import toast from "react-hot-toast"
+
 
 const SearchBar = ({ onSearch }) => {
     const durationRef = useRef(null);
@@ -31,8 +34,14 @@ const SearchBar = ({ onSearch }) => {
             }
 
             const data = await response.json();
-            onSearch(data);
+            if (data.length === 0) {
+                toast.error("No tours available for the specified criteria.");
+            } else{
+                onSearch(data);
+            
+            }
             console.log(data)
+    
         } catch (error) {
             console.error('Error:', error);
         }
@@ -55,8 +64,8 @@ const SearchBar = ({ onSearch }) => {
                         </div>
                     </FormGroup>
 
-                    <FormGroup className="d-flex gap-3 form__group form__group-last">
-                        <span><i className="ri-group-line"></i></span>
+                   <FormGroup className="d-flex gap-3 form__group form__group-last">
+                        <span><i class="ri-wallet-3-fill"></i></span>
                         <div>
                             <h6>Price</h6>
                             <input type="number" placeholder="0" ref={priceRef} />

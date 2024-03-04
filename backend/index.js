@@ -1,4 +1,5 @@
 const http = require("http")
+const cors = require("cors")
 const dotenv = require("dotenv")
 const app = require("./src/config/app")
 const { connectDB } = require("./src/config/db")
@@ -7,6 +8,8 @@ const { MONGODB_URL, PORT, HOST } = require("./src/constants/env")
 // initializing server
 const host = HOST
 const port = PORT
+
+
 
 async function start() {
 	const mongoURL = MONGODB_URL

@@ -1,12 +1,23 @@
-import React from "react";
+import React ,{ useContext }from "react";
 import { Card, CardBody } from "reactstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import roundRating from "../utils/ratings";
+import { AuthContext } from "../context/AuthContext"; 
 
 const SearchResultList = ({ searchResults }) => {
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   if (!Array.isArray(searchResults) || searchResults.length === 0) {
     return <div className="text-center">No results found.</div>;
   }
+  
+   const handleBookingClick = (tour) => {
+    if (!user) {
+      navigate("/login"); // Redirect to login page if not logged in
+    } else {
+        navigate("/book", { state: { tour } });
+    }
+  };
 
   return (
     <div className="flex gap-1">
@@ -18,12 +29,12 @@ const SearchResultList = ({ searchResults }) => {
             </div>
             <CardBody>
               <h5 className="tour__title mt-2">
-                <span>{result.Travel_Company}</span>
+                <span>{result.Destination} </span>
               </h5>
               <div className="tour__details">
                 <span className="tour__location d-flex align-items-center gap-1">
                   <i className="ri-map-pin-line"></i>
-                  {result.Destination}  
+                  {result.Travel_Company} 
                 </span>
                 <span className="tour__duration d-flex align-items-center gap-1">
                   <i className="ri-time-line"></i>
@@ -38,7 +49,7 @@ const SearchResultList = ({ searchResults }) => {
                 <h5>
                   Rs. {result.Price} <span> /per person</span>
                 </h5>
-                <button className="booking__btn">
+                <button className="booking__btn" onClick={() =>handleBookingClick(result)}>
                   <Link to="#"> Book Now</Link>
                 </button>
               </div>
