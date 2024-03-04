@@ -14,12 +14,15 @@ const createBooking = async (req, res) => {
 }
 
 const getBookings = async (req, res) => {
-  const { userId } = req.params
+  const { id } = req.params
   try {
-    const bookings = await Booking.find({ userId })
+   
+    const bookings = await Booking.find({ userId:id })
+    
     res.status(200).send(bookings)
   } catch (error) {
     console.error("Error getting bookings:", error)
+    
     res.status(500).send({ error: "Failed to get bookings" })
   }
 }

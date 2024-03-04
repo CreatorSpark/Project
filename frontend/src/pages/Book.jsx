@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from "react"
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { AuthContext } from "../context/AuthContext" // Adjust the import path as necessary
 import toast from "react-hot-toast"
 const Book = () => {
   const { user } = useContext(AuthContext) // Access user from context
-
+  const navigate = useNavigate();
   const location = useLocation()
 
   const [bookingDetails, setBookingDetails] = useState({
@@ -87,6 +87,7 @@ const Book = () => {
         const data = await response.json()
         toast.success("Booked")
         console.log("Booking successful:", data)
+        navigate("/")
       } else {
         toast.error("Booking Failed")
       }
